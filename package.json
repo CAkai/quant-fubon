@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsx src/index.ts",
-    "step1": "tsx src/step1.ts"
+    "dev": "tsx js_fubon_neo/index.ts",
+    "example": "node js_fubon_neo/example.mjs",
+    "balance": "node js_fubon_neo/check_account_balance.mjs"
   },
   "repository": {
     "type": "git",
@@ -20,7 +21,7 @@
   },
   "homepage": "https://github.com/chuangtc/quant-fubon#readme",
   "devDependencies": {
-    "@types/dotenv": "^6.1.1",
+    "@types/node": "^22.0.0",
     "tsx": "^4.19.3",
     "typescript": "^5.7.3"
   },

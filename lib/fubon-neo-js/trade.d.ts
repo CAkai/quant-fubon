@@ -407,6 +407,7 @@ export interface DayTradeStockInfo {
   precollectSingle?: number
   precollectAccumulate?: number
   status?: number
+  dispositionStatus?: string
 }
 export interface MarginShortQuota {
   stockNo?: string
@@ -434,6 +435,8 @@ export interface ModifyPrice {
   newPrice?: string
   /** 價格別異動 */
   newPriceType?: PriceType
+  /** 盤別 */
+  marketType: MarketType
 }
 export interface ModifyQuantity {
   /** 委託單號 */
@@ -560,6 +563,32 @@ export interface Settlement {
   totalTax?: number
   totalSettlementAmount?: number
   currency?: string
+}
+export interface SymbolQuote {
+  market: string
+  symbol: string
+  istibOrPsb: boolean
+  marketType: MarketType
+  status?: number
+  referencePrice?: number
+  unit: number
+  updateTime: string
+  limitupPrice?: number
+  limitdownPrice?: number
+  openPrice?: number
+  highPrice?: number
+  lowPrice?: number
+  lastPrice?: number
+  totalVolume?: number
+  totalTransaction?: number
+  totalValue?: number
+  lastSize?: number
+  lastTransaction?: number
+  lastValue?: number
+  bidPrice?: number
+  bidVolume?: number
+  askPrice?: number
+  askVolume?: number
 }
 export interface Unrealized {
   date: string
@@ -693,6 +722,8 @@ export interface TpslOrder {
   targetPrice: string
   /** 價格 */
   price?: string
+  /** trigger */
+  trigger?: TriggerContent
 }
 export interface FutOptTpslOrder {
   /** ROD/FOK/IOC */
@@ -705,6 +736,8 @@ export interface FutOptTpslOrder {
   targetPrice: string
   /** 價格 */
   price?: string
+  /** trigger */
+  trigger?: TriggerContent
 }
 export interface TpslWrapper {
   stopSign: StopSign
@@ -937,7 +970,13 @@ export const enum Oxtp {
 export const enum CallPut {
   Call = 'Call',
   Put = 'Put',
+  UnSupported = 'UnSupported',
   UnDefined = 'UnDefined'
+}
+export const enum StockType {
+  Stock = 'Stock',
+  CovertBond = 'CovertBond',
+  EtfAndEtn = 'EtfAndEtn'
 }
 export interface OrderObject {
   buySell: BSAction
@@ -1103,6 +1142,16 @@ export interface Account {
   branchNo: string
   account: string
   accountType: string
+}
+export interface SymbolQuoteResponse {
+  isSuccess: boolean
+  data?: SymbolQuote
+  message?: string
+}
+export interface VecSymbolQuoteResponse {
+  isSuccess: boolean
+  data?: Array<SymbolQuote>
+  message?: string
 }
 export type JsAccounting = Accounting
 export declare class Accounting {
@@ -1828,14 +1877,14 @@ export declare class FutOpt {
   singleCondition(account: JsAccount, startDate: string, endDate: string, stopSign: StopSign, condition: Condition, order: FutOptConditionOrder, childInfo?: FutOptTPSLWrapper | undefined | null): Response<ConditionOrderResult>
   multiCondition(account: JsAccount, startDate: string, endDate: string, stopSign: StopSign, conditions: Array<Condition>, order: FutOptConditionOrder, childInfo?: FutOptTPSLWrapper | undefined | null): Response<ConditionOrderResult>
   timeSliceOrder(account: JsAccount, startDate: string, endDate: string, stopSign: StopSign, splitDescription: SplitDescription, order: FutOptConditionOrder): Response<ConditionOrderResult>
-  getTimeSliceOrder(account: JsAccount, batchNo: string, marketType?: FutOptConditionMarketType | undefined | null): Response<Array<ConditionDetail>
-  getConditionHistory(account: JsAccount, startDate: string, endDate: string, marketType?: FutOptConditionMarketType | undefined | null, historyType?: HistoryStatus | undefined | null): Response<Array<ConditionDetail>
-  getConditionOrder(account: JsAccount, marketType?: FutOptConditionMarketType | undefined | null, conditionStatus?: ConditionStatus | undefined | null): Response<Array<ConditionDetail>
+  getTimeSliceOrder(account: JsAccount, batchNo: string, marketType?: FutOptConditionMarketType | undefined | null): Response<Array<ConditionDetail>>
+  getConditionHistory(account: JsAccount, startDate: string, endDate: string, marketType?: FutOptConditionMarketType | undefined | null, historyType?: HistoryStatus | undefined | null): Response<Array<ConditionDetail>>
+  getConditionOrder(account: JsAccount, marketType?: FutOptConditionMarketType | undefined | null, conditionStatus?: ConditionStatus | undefined | null): Response<Array<ConditionDetail>>
   cancelConditionOrders(account: JsAccount, guid: string, marketType?: FutOptConditionMarketType | undefined | null): Response<string>
   trailProfit(account: JsAccount, startDate: string, endDate: string, stopSign: StopSign, trailOrder: FutOptTrailOrder): Response<ConditionOrderResult>
-  getTrailOrder(account: JsAccount, marketType?: FutOptConditionMarketType | undefined | null): Response<Array<ConditionDetail>
-  getTrailHistory(account: JsAccount, startDate: string, endDate: string, marketType?: FutOptConditionMarketType | undefined | null): Response<Array<ConditionDetail>
-  getConditionOrderById(account: JsAccount, guid: string, marketType?: FutOptConditionMarketType | undefined | null): Response<Array<ConditionDetail>
+  getTrailOrder(account: JsAccount, marketType?: FutOptConditionMarketType | undefined | null): Response<Array<ConditionDetail>>
+  getTrailHistory(account: JsAccount, startDate: string, endDate: string, marketType?: FutOptConditionMarketType | undefined | null): Response<Array<ConditionDetail>>
+  getConditionOrderById(account: JsAccount, guid: string, marketType?: FutOptConditionMarketType | undefined | null): Response<Array<ConditionDetail>>
 }
 export type JsFutOptAccounting = FutOptAccounting
 export declare class FutOptAccounting {
@@ -2623,19 +2672,37 @@ export declare class Stock {
   singleCondition(account: Account, startDate: string, endDate: string, stopSign: StopSign, condition: Condition, order: ConditionOrder, childInfo?: TPSLWrapper | undefined | null): Response<ConditionOrderResult>
   multiCondition(account: Account, startDate: string, endDate: string, stopSign: StopSign, conditions: Array<Condition>, order: ConditionOrder, childInfo?: TPSLWrapper | undefined | null): Response<ConditionOrderResult>
   timeSliceOrder(account: Account, startDate: string, endDate: string, stopSign: StopSign, splitDescription: SplitDescription, order: ConditionOrder): Response<ConditionOrderResult>
-  getTimeSliceOrder(account: Account, batchNo: string): Response<Array<ConditionDetail>
-  getConditionHistory(account: Account, startDate: string, endDate: string, historyType?: HistoryStatus | undefined | null): Response<Array<ConditionDetail>
-  getConditionOrder(account: Account, conditionStatus?: ConditionStatus | undefined | null): Response<Array<ConditionDetail>
+  getTimeSliceOrder(account: Account, batchNo: string): Response<Array<ConditionDetail>>
+  getConditionHistory(account: Account, startDate: string, endDate: string, historyType?: HistoryStatus | undefined | null): Response<Array<ConditionDetail>>
+  getConditionOrder(account: Account, conditionStatus?: ConditionStatus | undefined | null): Response<Array<ConditionDetail>>
   cancelConditionOrders(account: Account, guid: string): Response<string>
   trailProfit(account: Account, startDate: string, endDate: string, stopSign: StopSign, trailOrder: TrailOrder): Response<ConditionOrderResult>
-  getTrailOrder(account: Account): Response<Array<ConditionDetail>
-  getTrailHistory(account: Account, startDate: string, endDate: string): Response<Array<ConditionDetail>
-  getConditionOrderById(account: Account, guid: string): Response<Array<ConditionDetail>
-  getConditionDaytradeById(account: Account, guid: string): Response<Array<ConditionDetail>
+  getTrailOrder(account: Account): Response<Array<ConditionDetail>>
+  getTrailHistory(account: Account, startDate: string, endDate: string): Response<Array<ConditionDetail>>
+  getConditionOrderById(account: Account, guid: string): Response<Array<ConditionDetail>>
+  getConditionDaytradeById(account: Account, guid: string): Response<Array<ConditionDetail>>
   singleConditionDayTrade(account: Account, stopSign: StopSign, endTime: string, condition: Condition, order: ConditionOrder, dayTrade: ConditionDayTrade, childInfo?: TPSLWrapper | undefined | null, fixSession?: boolean | undefined | null): Response<ConditionOrderResult>
   multiConditionDayTrade(account: Account, stopSign: StopSign, endTime: string, conditions: Array<Condition>, order: ConditionOrder, dayTrade: ConditionDayTrade, childInfo?: TPSLWrapper | undefined | null, fixSession?: boolean | undefined | null): Response<ConditionOrderResult>
   singleConditionStop(account: Account, startDate: string, endDate: string, stopSign: StopSign, condition: Condition, order: ConditionOrder, stopConditions: Array<Condition>, secondStopConditions?: Array<Condition> | undefined | null, childInfo?: TPSLWrapper | undefined | null): Response<ConditionOrderResult>
   multiConditionStop(account: Account, startDate: string, endDate: string, stopSign: StopSign, conditions: Array<Condition>, order: ConditionOrder, stopConditions: Array<Condition>, secondStopConditions?: Array<Condition> | undefined | null, childInfo?: TPSLWrapper | undefined | null): Response<ConditionOrderResult>
+  /**
+   * Query symbol quote information
+   *
+   * @param account - Query account
+   * @param symbol - Stock symbol (e.g., "2330")
+   * @param market_type - Market type (optional, default: Common)
+   * @returns Response object containing symbol quote information
+   */
+  querySymbolQuote(account: Account, symbol: string, marketType?: MarketType | undefined | null): Response<SymbolQuote>
+  /**
+   * Query symbol snapshot information for multiple stocks
+   *
+   * @param account - Query account
+   * @param market_type - Market type (optional, default: Common)
+   * @param stock_types - Stock types to filter (optional, default: [Stock])
+   * @returns Response object containing multiple symbol quote information
+   */
+  querySymbolSnapshot(account: Account, marketType?: MarketType | undefined | null, stockTypes?: Array<StockType> | undefined | null): Response<SymbolQuote[]>
 }
 export declare class FugleRealtime {
   
@@ -2647,7 +2714,7 @@ export declare class FugleRealtime {
 }
 export type JsCoreSDK = CoreSdk
 export declare class CoreSdk {
-  constructor(version: string, url: string)
+  constructor(version: string, pongInteval?: number | undefined | null, missedCount?: number | undefined | null, url?: string | undefined | null)
   /**
    * Login Fubon Neo with Your Account
    *
@@ -2676,9 +2743,27 @@ export declare class CoreSdk {
    * }
    * ```
    */
-  login(personalId: string, pass: string, certPath: string, certPass?: string | undefined | null): Response<Account>
+  login(personalId: string, pass: string, certPath: string, certPass?: string | undefined | null): Response<Array<Account>>
   logout(): boolean
-  dmaLogin(personalId: string, pass: string): Response<Account>
+  dmaLogin(personalId: string, pass: string): Response<Array<Account>>
+  /**
+   * API Key login (normal mode with certificate)
+   *
+   * @param personal_id - User ID (身份證號)
+   * @param api_key - API Key string
+   * @param cert_path - Path to certificate file
+   * @param cert_pass - Optional certificate password (defaults to personal_id)
+   * @returns Response with array of Account objects
+   */
+  apikeyLogin(personalId: string, apiKey: string, certPath: string, certPass?: string | undefined | null): Response<Array<Account>>
+  /**
+   * API Key login (DMA mode without certificate)
+   *
+   * @param personal_id - User ID (身份證號)
+   * @param api_key - API Key string
+   * @returns Response with array of Account objects
+   */
+  apikeyDmaLogin(personalId: string, apiKey: string): Response<Array<Account>>
   exchangeRealtimeToken(): string
   /**
    * Stock trading function

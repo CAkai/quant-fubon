@@ -8,7 +8,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
-    "rootDir": "./src"
+    "rootDir": "js_fubon_neo"
   },
-  "include": ["src/**/*"]
+  "include": ["js_fubon_neo/**/*"]
 }
