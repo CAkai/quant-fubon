@@ -1,3 +1,5 @@
+
+
 # quant-fubon
 
 Python and TypeScript version of interaction with Fubon TradeAPI
@@ -33,10 +35,10 @@ quant-fubon/
 
 ## Setup
 
-Copy `env.example` to `.env` and fill in your credentials:
+Copy `.env.example` to `.env` and fill in your credentials:
 
 ```bash
-cp env.example .env
+cp .env.example .env
 ```
 
 ```ini
